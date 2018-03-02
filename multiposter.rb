@@ -32,6 +32,12 @@ Plugin.create(:multiposter) do
           compose worlds[i], body: body
         end
       end
+
+      if Gtk::PostBox.list[0] != postbox
+        postbox.destroy
+      else
+        postbox.widget_post.buffer.text = ''
+      end
     end
   end
 end
