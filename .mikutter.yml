@@ -1,0 +1,12 @@
+---
+slug: :multiposter
+depends:
+  mikutter: 3.6.4
+  plugin:
+    - world
+    - spell
+    - command
+version: '1.0'
+author: 
+name: マルチポスター
+description: mikutterで複数のworldにマルチポストするプラグインです。ご利用は計画的に。
