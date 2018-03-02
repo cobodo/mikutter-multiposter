@@ -8,6 +8,8 @@ mkdir -p ~/.mikutter/plugin && git clone git://github.com/cobodo/mikutter-multip
 
 ## 注意事項
 twitterは複数アカウントでのマルチポストを禁止しています。twitter worldは1つだけ選択するようにしましょう。
+
 mstdn.jpはtwitterとのマルチポストは未収載にするように勧告しています。投稿する前にデフォルトの公開範囲を未収載にしておきましょう。
-あとは自己責任です。アカウント凍結等の責任は一切負いません。
+
+基本的には自己責任です。アカウント凍結等の責任は一切負いません。
 
