@@ -40,4 +40,35 @@ Plugin.create(:multiposter) do
       end
     end
   end
+
+  command(
+    :multipost_portal,
+    name: 'マルチポストする(Portal)',
+    condition: -> (opt) {
+      opt.widget.editable? && Plugin.filtering(:world_current, nil).first.class.slug == :portal
+    },
+    visible: true,
+    icon: Skin['post.png'],
+    role: :postbox
+  ) do |opt|
+    portal = Plugin.filtering(:world_current, nil).first
+    worlds = [portal.world, portal.next_portal.world]
+
+    i_postbox = opt.widget
+    postbox, = Plugin.filtering(:gui_get_gtk_widget, i_postbox)
+    body = postbox.widget_post.buffer.text
+    next if (body.nil? || body.empty?)
+
+    ds = []
+    worlds.each do |world|
+      ds << compose(world, body: body)
+    end
+    Delayer::Deferred.when(ds).next {
+      if Gtk::PostBox.list[0] != postbox
+        postbox.destroy
+      else
+        postbox.widget_post.buffer.text = ''
+      end
+    }
+  end
 end
