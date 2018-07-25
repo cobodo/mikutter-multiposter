@@ -1,11 +1,13 @@
 ---
 slug: :multiposter
 depends:
-  mikutter: 3.6.4
+  mikutter: 3.7.3
   plugin:
     - world
     - spell
     - command
+    - current_world
+    - change_account
 version: '1.0'
 author: 
 name: マルチポスター

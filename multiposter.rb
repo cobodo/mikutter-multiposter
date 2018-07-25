@@ -89,4 +89,40 @@ Plugin.create(:multiposter) do
     portal = Plugin.filtering(:world_current, nil).first
     post_to_worlds(opt, [portal.next_portal.world])
   end
+
+  filter_command do |menu|
+    Enumerator.new{|y|
+      Plugin.filtering(:worlds, y)
+    }.each do |world|
+      slug = "compose_by_#{world.slug}".to_sym
+      menu[slug] = {
+        slug: slug,
+        exec: -> opt {
+          Plugin.call(:compose_by_specific_world, opt.widget, world)
+        },
+        plugin: @name,
+        name: _('%{title}(%{world}) で投稿する'.freeze) % {
+          title: world.title,
+          world: world.class.slug
+        },
+        condition: -> opt { opt.widget.editable?  },
+        visible: false,
+        role: :postbox,
+        icon: world.icon } end
+    [menu]
+  end
+
+  on_compose_by_specific_world do |i_postbox, world|
+    current = Plugin.filtering(:world_current, nil).first
+    next unless current
+
+    # 同じpriority（両方ともデフォルト）ならPlugin.callの順序は保たれると仮定している
+    Plugin.call(:world_change_current, world)
+    Plugin.call(:compose_by_specific_world2, i_postbox, current)
+  end
+
+  on_compose_by_specific_world2 do |i_postbox, current|
+    i_postbox.post_it!
+    Plugin.call(:world_change_current, current)
+  end
 end
