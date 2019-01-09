@@ -1,25 +1,5 @@
 # -*- coding: utf-8 -*-
 
-class Gtk::PostBox < Gtk::EventBox
-  def post_it
-    if postable?
-      return unless before_post
-      @posting = Plugin[:gtk].compose(
-        current_world,
-        to_display_only? ? nil : @to.first,
-        **compose_options
-      ).next{
-        Plugin.call(:gui_postbox_posted, self)
-        destroy
-      }.trap{ |err|
-        warn err
-        end_post
-      }
-      start_post
-    end
-  end
-end
-
 Plugin.create(:multiposter) do
   command(
     :multipost,
@@ -108,48 +88,5 @@ Plugin.create(:multiposter) do
   ) do |opt|
     portal = Plugin.filtering(:world_current, nil).first
     post_to_worlds(opt, [portal.next_portal.world])
-  end
-
-  filter_command do |menu|
-    Enumerator.new{|y|
-      Plugin.filtering(:worlds, y)
-    }.each do |world|
-      slug = "compose_by_#{world.slug}".to_sym
-      menu[slug] = {
-        slug: slug,
-        exec: -> opt {
-          Plugin.call(:compose_by_specific_world, opt.widget, world)
-        },
-        plugin: @name,
-        name: _('%{title}(%{world}) で投稿する'.freeze) % {
-          title: world.title,
-          world: world.class.slug
-        },
-        condition: -> opt { opt.widget.editable?  },
-        visible: false,
-        role: :postbox,
-        icon: world.icon } end
-    [menu]
-  end
-
-  on_compose_by_specific_world do |i_postbox, world|
-    current = Plugin.filtering(:world_current, nil).first
-    next unless current
-
-    # 次にworldが変更されたタイミングでpost_itをトリガーするイベントハンドラ
-    change_observer = on_primary_service_changed do |cur|
-      # world変更を検知できたのでもう必要ない
-      detach change_observer
-
-      # 投稿後にworldを戻すイベントハンドラ
-      posted_observer = on_gui_postbox_posted do |_|
-        detach posted_observer
-        Plugin.call(:world_change_current, current)
-      end
-      # 投稿を実行
-      Plugin.call(:gui_postbox_post, i_postbox)
-    end
-    # worldを変更して↑を起動する
-    Plugin.call(:world_change_current, world)
   end
 end
