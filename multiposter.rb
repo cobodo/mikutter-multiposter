@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
 class Gtk::PostBox < Gtk::EventBox
-  def post_it
+  def post_it(world: target_world)
     if postable?
-      return unless before_post
+      return unless before_post(world: world || target_world)
       @posting = Plugin[:gtk].compose(
-        current_world,
+        world || target_world,
         to_display_only? ? nil : @to.first,
         **compose_options
       ).next{
